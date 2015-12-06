@@ -7,25 +7,14 @@ import argparse
 import sys
 import os
 
-# Sets up the flags that can be passed to the build system
-parser = argparse.ArgumentParser(description="Builds then runs the project " \
-        "as described by the makefile")
-parser.add_argument("-r", "--rebuild", action="store_true",
-        help="Runs make clean before building the project")
-parser.add_argument("--run", action="store_true",
-        help="Attempts to run the project without compiling it.")
-parser.add_argument("-v", "--verbose", action="store_true",
-        help="Prints what commands are being run")
-parser.add_argument("-c", "--compile", action="store_true",
-        help="Compiles the project without running it.")
-parser.add_argument("-f", "--force", action="store_true",
-        help="Forces the script to try to execute the program even if it " \
-                "failed to compile")
-args = parser.parse_args()
+# Global flag to determine if the program should be verbose or not
+global VERBOSE
+VERBOSE = False
+
 
 # Prints the message if verbose mode is on
 def verbose(msg):
-    if args.verbose:
+    if VERBOSE:
         print(msg) 
 
 # Runs make clean
@@ -69,19 +58,19 @@ def lsfiles(directory):
 	return ret
 
 # Checks if there is a newer source file than the existing class files
-def incremental():
+def incremental(force_compile):
 
     src = lsfiles("src/")
     bld = lsfiles("build/")
     
-    if args.compile:
-        verbose("Rebuilding the project b/c of -c flag.")
+    if force_compile:
+        verbose("Rebuilding the project b/c of -f flag.")
         build()
     elif len(bld) == 0:
-        verbose("Rebuilding the project b/c no files build dir")
+        verbose("Rebuilding the project b/c no files build directory.")
         build()
     else:
-        verbose("Checking if project needs to be recompiled")
+        verbose("Checking if project needs to be recompiled.")
         rebuild = False
 
         src = path_clean(src)
@@ -96,10 +85,10 @@ def incremental():
                 break
 
         if rebuild:
-            verbose("Rebuilding the project b/c a change was found")
+            verbose("Rebuilding the project b/c a change was found.")
             build()
         else:
-            verbose("Not rebuilding the project")
+            verbose("Not rebuilding the project.")
 
 # Given a filename, this checks if the src file is newer than the .class file
 def is_updated(filename):
@@ -119,23 +108,43 @@ def path_clean(path_list):
 # Main method of the program
 def main():
 
+    # Sets up the flags that can be passed to the build system
+    parser = argparse.ArgumentParser(
+        description="builds and then runs the project as described by the makefile")
+    parser.add_argument("-r", "--rebuild", action="store_true", 
+        help="runs make clean before building the project")
+    parser.add_argument("--run", action="store_true", 
+        help="attempts to run the project without compiling it")
+    parser.add_argument("-v", "--verbose", action="store_true", 
+        help="prints what the program is doing")
+    parser.add_argument("-c", "--compile", action="store_true",
+        help="compiles the project without running it")
+    parser.add_argument("-f", "--force", action="store_true", 
+        help="forces the program to recompile the entire project")
+    args = parser.parse_args()
+
     if not os.path.isfile("makefile") and not os.path.isfile("Makefile"):
-        print("There must be a vaild makefile in the directory")
+        print("There must be a vaild makefile in the directory.")
         sys.exit(1)
 
+    if args.verbose == True:        # If -v was passed, VERBOSE = True
+        global VERBOSE
+        VERBOSE = True
     rebuild = args.rebuild          # If -r was passed, clean = True
     build = args.compile            # If -c was passed, comp = True
+    force = args.force              # If -f was passed, force = True
     run = args.run                  # If --run was passed, run = True
+
     
     if rebuild:
         clean()
 
     if build:
-        incremental()
+        incremental(force)
     elif run:
         execute()
     else:
-        incremental()
+        incremental(force)
         execute()
 
 # Runs the program
