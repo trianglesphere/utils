@@ -14,6 +14,8 @@ set nu
 
 "Show a ruler
 set colorcolumn=80
+"Stop vim word word wrapping automatically
+set tw=0
 
 " Enable syntax highlighting
 syntax enable
