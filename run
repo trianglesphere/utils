@@ -1,0 +1,122 @@
+#!/usr/bin/env python3
+# This program was developed using python version 3.4.3
+# Copyright (c) 2015 Joshua Gutow under the MIT License
+
+import subprocess
+import argparse
+import sys
+import os
+
+# Sets up the flags that can be passed to the build system
+parser = argparse.ArgumentParser(description="Builds then runs the project " \
+        "as described by the makefile")
+parser.add_argument("-r", "--rebuild", action="store_true",
+        help="Runs make clean before building the project")
+parser.add_argument("--run", action="store_true",
+        help="Attempts to run the project without compiling it.")
+parser.add_argument("-v", "--verbose", action="store_true",
+        help="Prints what commands are being run")
+parser.add_argument("-c", "--compile", action="store_true",
+        help="Compiles the project without running it.")
+parser.add_argument("-f", "--force", action="store_true",
+        help="Forces the script to try to execute the program even if it " \
+                "failed to compile")
+args = parser.parse_args()
+
+# Handes printed msgs when verbose mode is on cleanly
+def verbose(msg):
+    if args.verbose:
+        print(msg) 
+
+# Runs make clean
+def clean():
+    try:
+        tmp = subprocess.check_output(["make", "clean"])
+        tmp = tmp.decode("utf-8")
+        verbose(tmp[0:-1])
+    except subprocess.CalledProcessError:
+        pass
+
+# Compiles the build using make
+def build():
+    try:
+        tmp = subprocess.check_output(["make"])
+        tmp = tmp.decode("utf-8")
+        verbose(tmp[0:-1])
+    except subprocess.CalledProcessError:
+        if not args.force:
+            sys.exit(1) # Error in the compilation of the project
+
+# Runs the build
+def execute():
+    params = ["java", "-cp", "build/", "main"]
+    verbose(" ".join(params) + "\n----Output Below----")
+    try:
+        subprocess.call(params)
+    except subprocess.CalledProcessError:
+        sys.exit(1) # Error when running the program
+
+# Checks if there is a newer source file than the existing class files
+# Needs a more robust system to check if src files == bld files
+def incremental():
+
+    src = sorted(os.listdir("src/"))
+    bld = sorted(os.listdir("build/"))
+
+    # If instructed to compile, compile the project even if not needed.
+    if args.compile:
+        verbose("Rebuilding the project b/c of -c flag.")
+        build()
+    elif len(bld) == 0:
+        verbose("Rebuilding the project b/c no files build dir")
+        build()
+    else:
+        verbose("Checking if project needs to be recompiled")
+        rebuild = False
+
+        # Loops through 
+        for i in range(0, len(src)):     
+            if src[i][0:src[i].find(".")] != bld[i][0:bld[i].find(".")]:
+                rebuild = True
+                break
+            elif is_updated(src[i], bld[i]):
+                rebuild = True
+                break
+
+        if rebuild:
+            verbose("Rebuilding the project b/c no change found")
+            build()
+        else:
+            verbose("Not rebuilding the project")
+
+# Given a filename, this checks if the src file is newer than the .class file
+def is_updated(src_file, bld_file):
+    srcpath = "src/"
+    bldpath = "build/"
+    src = os.stat(srcpath + src_file).st_mtime_ns
+    bld = os.stat(bldpath + bld_file).st_mtime_ns
+    return src > bld
+
+# Main method of the program
+def main():
+
+    if not os.path.isfile("makefile") and not os.path.isfile("Makefile"):
+        print("There must be a vaild makefile in the directory")
+        sys.exit(1)
+
+    rebuild = args.rebuild          # If -r was passed, clean = True
+    build = args.compile            # If -c was passed, comp = True
+    run = args.run                  # If --run was passed, run = True
+    
+    if rebuild:
+        clean()
+
+    if build:
+        incremental()
+    elif run:
+        execute()
+    else:
+        incremental()
+        execute()
+    
+main()
