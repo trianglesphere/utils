@@ -78,8 +78,8 @@ def lsdirs(directory):
 # Checks if there is a newer source file than the existing class files
 def incremental(force_compile):
 
-    src = lsfiles("src/")
-    bld = lsfiles("build/")
+    src = path_clean(lsfiles("src/"))
+    bld = path_clean(lsfiles("build/"))
     
     if force_compile:
         verbose("Rebuilding the project b/c of -f flag.")
@@ -88,12 +88,7 @@ def incremental(force_compile):
         verbose("Rebuilding the project b/c no files build directory.")
         build("main")
     else:
-        verbose("Checking if project needs to be recompiled.")
-        rebuild = False
-
-        src = path_clean(src)
-        bld = path_clean(bld)
-        
+        verbose("Checking if project needs to be recompiled.")        
         for path in src:
             if path not in bld:
                 verbose("Rebuilding b/c " + path + " is in src but not bld")
