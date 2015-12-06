@@ -23,7 +23,7 @@ parser.add_argument("-f", "--force", action="store_true",
                 "failed to compile")
 args = parser.parse_args()
 
-# Handes printed msgs when verbose mode is on cleanly
+# Prints the message if verbose mode is on
 def verbose(msg):
     if args.verbose:
         print(msg) 
@@ -41,8 +41,7 @@ def clean():
 def build():
     try:
         tmp = subprocess.check_output(["make"])
-        tmp = tmp.decode("utf-8")
-        verbose(tmp[0:-1])
+        verbose(tmp.decode("utf-8")[0:-1])
     except subprocess.CalledProcessError:
         if not args.force:
             sys.exit(1) # Error in the compilation of the project
@@ -56,14 +55,25 @@ def execute():
     except subprocess.CalledProcessError:
         sys.exit(1) # Error when running the program
 
+# Gets all the files in a given dir.
+def lsfiles(directory):
+	if directory[-1] != "/":
+		directory = directory + "/"
+	tmp = os.listdir(directory)
+	ret = []
+	for path in tmp:
+		if os.path.isdir(directory + path):
+			ret = ret + lsfiles(directory+ path)
+		else:
+			ret.append(directory + path)
+	return ret
+
 # Checks if there is a newer source file than the existing class files
-# Needs a more robust system to check if src files == bld files
 def incremental():
 
-    src = sorted(os.listdir("src/"))
-    bld = sorted(os.listdir("build/"))
-
-    # If instructed to compile, compile the project even if not needed.
+    src = lsfiles("src/")
+    bld = lsfiles("build/")
+    
     if args.compile:
         verbose("Rebuilding the project b/c of -c flag.")
         build()
@@ -74,28 +84,37 @@ def incremental():
         verbose("Checking if project needs to be recompiled")
         rebuild = False
 
-        # Loops through 
-        for i in range(0, len(src)):     
-            if src[i][0:src[i].find(".")] != bld[i][0:bld[i].find(".")]:
+        src = path_clean(src)
+        bld = path_clean(bld)
+        
+        for path in bld:
+            if path not in src:
                 rebuild = True
                 break
-            elif is_updated(src[i], bld[i]):
+            elif is_updated(path):
                 rebuild = True
                 break
 
         if rebuild:
-            verbose("Rebuilding the project b/c no change found")
+            verbose("Rebuilding the project b/c a change was found")
             build()
         else:
             verbose("Not rebuilding the project")
 
 # Given a filename, this checks if the src file is newer than the .class file
-def is_updated(src_file, bld_file):
+def is_updated(filename):
     srcpath = "src/"
     bldpath = "build/"
-    src = os.stat(srcpath + src_file).st_mtime_ns
-    bld = os.stat(bldpath + bld_file).st_mtime_ns
+    src = os.stat(srcpath + filename + ".java").st_mtime_ns
+    bld = os.stat(bldpath + filename + ".class").st_mtime_ns
     return src > bld
+
+# Cleans up the path lists so that we are only looking at what we care about
+def path_clean(path_list):
+    ret = []
+    for path in path_list:
+        ret.append(path[path.find("/") + 1:path.find(".")])
+    return ret
 
 # Main method of the program
 def main():
@@ -118,5 +137,6 @@ def main():
     else:
         incremental()
         execute()
-    
+
+# Runs the program
 main()
