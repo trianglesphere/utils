@@ -17,14 +17,17 @@ def verbose(msg):
     if VERBOSE:
         print(msg) 
 
-# Runs make clean
+# Nukes the build directory
 def clean():
-    try:
-        tmp = subprocess.check_output(["make", "clean"])
-        tmp = tmp.decode("utf-8")
-        verbose(tmp[0:-1])
-    except subprocess.CalledProcessError:
-        pass
+    verbose("Deleting every file in build/")
+    path_list = lsfiles("build/")
+    dir_list = lsdirs("build/")
+
+    for obj in path_list:
+        if os.path.isfile(obj):
+            os.remove(obj)
+    for obj in dir_list:
+        os.rmdir(obj)
 
 # Compiles the build using make
 def build():
@@ -44,7 +47,7 @@ def execute():
     except subprocess.CalledProcessError:
         sys.exit(1) # Error when running the program
 
-# Gets all the files in a given dir.
+# Gets all the files in a dir tree where the given dir is the root
 def lsfiles(directory):
 	if directory[-1] != "/":
 		directory = directory + "/"
@@ -56,6 +59,19 @@ def lsfiles(directory):
 		else:
 			ret.append(directory + path)
 	return ret
+
+# Gets all the directories under a parent directory
+def lsdirs(directory):
+    if directory[-1] != "/":
+        directory = directory + "/"
+    tmp = os.listdir(directory)
+    ret = []
+    for path in tmp:
+        if os.path.isdir(directory + path):
+            ret.append(directory + path)
+            if len(lsdirs(directory + path)) != 0:
+                ret.appenda(lsdirs(directory + path))
+    return ret
 
 # Checks if there is a newer source file than the existing class files
 def incremental(force_compile):
