@@ -1,0 +1,34 @@
+This is some test text that I am using to test rmft on. This will also describe
+some of its behavoir.
+
+It needs to deal with lists:
+	1. How does it deal with this?
+		1. And this ?
+		2. And what about this when this
+		rolls over???
+	(A). What happens if I mix stuff?
+What about this??? - it is directly after the end of a list / dif indent level
+	And what about this???
+		How should sucessively indented levels be dealt with?
+	And what about this level, going backwards??
+
+
+
+How do I deal with multiple newlines??
+
+What about this?
+Or this?? How do I figure out when text is wrapped or not supposed to be 
+wrapped?
+
+The Rules of this Program are as follows:
+	1. It will replace a newline with a space between two lines.
+	2. Rule 1 will not apply if the lines are of different indentation
+	levels.
+	3. Rule 1 will also not apply when the line starts with certain strings
+	such as "1. " or "*" or anything else that denotes a list.
+	4. There should be a flag to turn off rule 2 & 3. This is not high
+	priority
+	5. Leading tabs should be removed when merging two lines.
+	6. Trailing whitespace should be removed from the document before
+	applying the rfmt.
+

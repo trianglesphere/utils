@@ -1,0 +1,85 @@
+#!/usr/bin/env python3
+# Developed by Joshua Gutow. Copyright 2016 under the MIT License.
+
+desc = '''This program takes manually word-wrapped files and unword wraps them.
+
+This program unword wraps using the following rules:
+    1. If there are multiple newlines in a row, only the first will be removed.
+    2. It will only merge lines if they have the same indent level.
+    3. It will try to perserve lists and simple bullet points.
+
+The text must be passed from either STDIN or the program must be given a text
+file to read from. If both are given, precedence is given to a file input.'''
+
+import argparse
+import sys
+import re
+
+# Sets up the command line arguments.
+parser = argparse.ArgumentParser(description=desc,
+                        formatter_class=argparse.RawDescriptionHelpFormatter)
+parser.add_argument("File", type=argparse.FileType('r'), metavar='F',
+                     help="File to be read from. Optional if given a STDIN.",
+                     nargs='?')
+args = parser.parse_args()
+
+# Reads either from STDIN or the specified file.
+# Throws an error is there is no input.
+if args.File != None:
+    file = args.File
+elif not sys.stdin.isatty():
+    file = sys.stdin
+else:
+    print("ERROR: There must be some standard input or a filename must be given")
+    sys.exit(1)
+
+# Sets up the lines to manipulated on by the program. 
+# An empty string is derived from an empty line.
+text = []
+for line in file:
+    text.append(line.rstrip())
+
+# Merges two lines together.
+def merge(one, two):
+    if one == "" or one[-1] == "\n":
+       return one + two.lstrip() 
+    return one + " " + two.lstrip()
+
+# Inserts a newline char between two lines.
+def append(one, two):
+    return one + "\n" + two
+
+# Figues out the ident level of a function.
+def indent_level(string):
+    lvl = 0
+    for char in string:
+        if char == "\t":
+            lvl += 1
+        else:
+            break
+    return lvl
+
+# Figues out if a the line contains the start of a list.
+def start_list(string):
+    list_patterns = ["[0-9?[.][ ]", "[*][ ]", "[A-Z][.][ ]"]
+    string = string.lstrip()
+    for regex in list_patterns:
+        if re.match(regex, string):
+            return True
+    return False
+
+ret = ""
+# Does the logic to figure out what lines to merge and what to append.
+for num in range(0, len(text)):
+    line = text[num]
+    if line == "":
+        ret += "\n"
+    elif num != 0 and indent_level(line) != indent_level(text[num-1]):
+        ret = append(ret, line) 
+    elif start_list(line):
+        ret = append(ret, line)
+    else:
+        ret = merge(ret, line)
+
+print(ret)
+
