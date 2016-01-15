@@ -8,8 +8,9 @@ This program unword wraps using the following rules:
     2. It will only merge lines if they have the same indent level.
     3. It will try to perserve lists and simple bullet points.
 
-The text must be passed from either STDIN or the program must be given a text
-file to read from. If both are given, precedence is given to a file input.'''
+You can give a file name, pipe text to it, or run rfmt without any parameters,
+and press CTRL-D (EOF) when you are done. If given both a file and STDIN, rfmt
+will rfmt the file.'''
 
 import argparse
 import sys
@@ -19,7 +20,7 @@ import re
 parser = argparse.ArgumentParser(description=desc,
                         formatter_class=argparse.RawDescriptionHelpFormatter)
 parser.add_argument("File", type=argparse.FileType('r'), metavar='F',
-                     help="File to be read from. Optional if given a STDIN.",
+                     help="File to be read from. Can also use STDIN.",
                      nargs='?')
 args = parser.parse_args()
 
@@ -27,11 +28,8 @@ args = parser.parse_args()
 # Throws an error is there is no input.
 if args.File != None:
     file = args.File
-elif not sys.stdin.isatty():
-    file = sys.stdin
 else:
-    print("ERROR: There must be some standard input or a filename must be given")
-    sys.exit(1)
+    file = sys.stdin
 
 # Sets up the lines to manipulated on by the program. 
 # An empty string is derived from an empty line.
@@ -61,7 +59,7 @@ def indent_level(string):
 
 # Figues out if a the line contains the start of a list.
 def start_list(string):
-    list_patterns = ["[0-9?[.][ ]", "[*][ ]", "[A-Z][.][ ]"]
+    list_patterns = ["[0-9]?[.][ ]", "[*][ ]", "[A-Z][.][ ]"]
     string = string.lstrip()
     for regex in list_patterns:
         if re.match(regex, string):
