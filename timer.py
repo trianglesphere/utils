@@ -1,6 +1,11 @@
 #!/usr/bin/env python3
 # Developed by Joshua Gutow. Copyright 2016 under the MIT License.
 
+import sys
+import argparse
+import time
+import datetime
+
 desc = '''This program helps you track the time you spend on something.
 The file timer_log in the current directory is used to track the time spent.
 The timer_log stoes the info in the following format: "[start/stop]:date\ttask"
@@ -10,10 +15,6 @@ Avaliable commands:
     start - log the current time as the start time.
     stop - log the current time as the end time.
     total - print out how much time has been spent.'''
-
-
-import argparse
-import time
 
 # Sets up the arguments for the program.
 def get_args():
@@ -25,9 +26,9 @@ def get_args():
     return parser.parse_args()
 
 # Returns the file object for timer_log in append mode.
-def open_time_log():
+def open_time_log(mode):
     try:
-        f = open("timer_log", "a", encoding="utf-8")
+        f = open("timer_log", mode, encoding="utf-8")
         return f
     except:
         print("Couldn't open the timer log file")
@@ -35,18 +36,80 @@ def open_time_log():
 
 # Writes the cmd, task, and current time to the file as described in the desc.
 def write(cmd, task):
-    f = open_time_log()
+    f = open_time_log("a")
 
     msg = cmd + ":" + time.strftime("%Y-%m-%dT%H:%M:%S")
-    if task != "":
-        msg += "\t" + task
+    if task != None:
+        msg += "\t" + task[0]
     msg += "\n"
 
     f.write(msg)
     f.close
 
+# Prints the total time spent on a task. A task of type None returns the total
+# time spent on all tasks.
+def print_total(task):
+    sum = datetime.timedelta()
+    f = open_time_log("r")
+    
+    # Sets up the system that figures out how to sort by task.
+    all_tasks = False
+    if task != None:
+        task = task[0]
+    else:
+        all_tasks = True
+
+    s1 = ""
+    s2 = ""
+    for line in f:
+        line = line.rstrip()
+
+        # Figues out if you have built up a match
+        if s1 != "" and s2 != "":
+            sum += get_time(s2) - get_time(s1)
+            s1 = ""
+            s2 = ""
+        # Need to immediately go into slotting into s1 / s2
+        if line.find("star") == 0 and (task == get_task(line) or all_tasks):
+            s1 = line
+        elif line.find("stop") == 0 and (task == get_task(line) or all_tasks):
+            s2 = line
+        else:
+            pass
+    # Clean up the very last set that isn't caught by the for loop.
+    if s1 != "" and s2 != "":
+        sum += get_time(s2) - get_time(s1)
+
+    print(sum)
+        
+# Gets the task associated with a line. If not task, returns None
+def get_task(line):
+    if "\t" in line:
+        return line[line.find("\t") + 1:]
+    return None
+
+# Pulls out a datetime object from a line in the timer_log
+def get_time(line):
+    if "\t" in line:
+        line = line[0:line.find("\t")]
+    line = line[line.find(":") + 1:].rstrip()
+    return datetime.datetime.strptime(line, "%Y-%m-%dT%H:%M:%S")
 
 
+def main():
+    args = get_args()
+    cmd = args.CMD[0]
+    if cmd == "start":
+        write(cmd, args.task) 
+    elif cmd == "stop":
+        write(cmd, args.task) 
+    elif cmd == "total":
+        print_total(args.task)
+    else:
+        print("Must pass a valid command. Refer to the help if needed.")
+        sys.exit(1)
+    
 
+if __name__ == '__main__':
+    main()
 
-write("start", "")
