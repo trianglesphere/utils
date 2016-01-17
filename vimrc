@@ -13,7 +13,7 @@ endif
 set nu
 
 "Show a ruler
-set colorcolumn=80
+set colorcolumn=81
 "Stop vim word word wrapping automatically
 set tw=0
 
