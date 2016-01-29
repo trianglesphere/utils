@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/python
 # Developed by Joshua Gutow. Copyright 2016 under the MIT License.
 
 desc = '''This program takes manually word-wrapped files and unword wraps them.
