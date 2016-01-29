@@ -21,7 +21,8 @@ set tw=0
 syntax enable
 
 " Set monokai as the colorscheme
-colorscheme monokai
+set background=dark
+colorscheme solarized
 
 " Set the font to Inconsolata
 set guifont=Inconsolata
@@ -35,8 +36,8 @@ set noexpandtab
 " Automatically match the indent of the previous line
 set autoindent
 
-" Set fdm to indent
-set fdm=indent
+" Set fdm to syntax
+set fdm=syntax
 " Open all folds
 set foldlevelstart=99
 
