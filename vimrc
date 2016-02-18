@@ -27,10 +27,10 @@ colorscheme solarized
 " Set the font to Inconsolata
 set guifont=Inconsolata
 
-" 1 tab is 8 columns wide and uses \t
-set shiftwidth=8
-set tabstop=8
-set softtabstop=8
+" 1 tab is 4 columns wide and uses \t
+set shiftwidth=4
+set tabstop=4
+set softtabstop=4
 set noexpandtab
 
 " Automatically match the indent of the previous line
@@ -39,7 +39,7 @@ set autoindent
 " Set fdm to syntax
 set fdm=syntax
 " Open all folds
-set foldlevelstart=99
+set foldlevel=99
 
 " Setting for list view
 set lcs=tab:\|\ 
