@@ -47,5 +47,6 @@ set lcs=tab:\|\
 " Auto indent in python/java
 autocmd BufRead *.py set smartindent cinwords=:
 autocmd BufRead *.py set expandtab tabstop=4 shiftwidth=4 softtabstop=4
+autocmd BufRead *.scm set expandtab tabstop=4 shiftwidth=4 softtabstop=4
 autocmd BufRead *.java set smartindent cinwords={,)
 
