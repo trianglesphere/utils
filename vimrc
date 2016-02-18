@@ -24,9 +24,6 @@ syntax enable
 set background=dark
 colorscheme solarized
 
-" Set the font to Inconsolata
-set guifont=Inconsolata
-
 " 1 tab is 4 columns wide and uses \t
 set shiftwidth=4
 set tabstop=4
