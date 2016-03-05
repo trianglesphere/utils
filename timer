@@ -7,8 +7,8 @@ import time
 import datetime
 
 desc = '''This program helps you track the time you spend on something.
-The file timer_log in the current directory is used to track the time spent.
-The timer_log stoes the info in the following format: "[start/stop]:date\ttask"
+The file .timer.log in the current directory is used to track the time spent.
+The timer log stores the info in the following format: "[start/stop]:date\ttask"
 
 
 Avaliable commands:
@@ -25,10 +25,11 @@ def get_args():
                         help="Specify the task that the time was spent on.")
     return parser.parse_args()
 
-# Returns the file object for timer_log in append mode.
+# Returns the file object for timer_log in the given mode as defined by the open
+# function.
 def open_time_log(mode):
     try:
-        f = open("timer_log", mode, encoding="utf-8")
+        f = open(".timer.log", mode, encoding="utf-8")
         return f
     except:
         print("Couldn't open the timer log file")
@@ -70,7 +71,7 @@ def print_total(task):
             s1 = ""
             s2 = ""
         # Need to immediately go into slotting into s1 / s2
-        if line.find("star") == 0 and (task == get_task(line) or all_tasks):
+        if line.find("start") == 0 and (task == get_task(line) or all_tasks):
             s1 = line
         elif line.find("stop") == 0 and (task == get_task(line) or all_tasks):
             s2 = line
