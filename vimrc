@@ -24,9 +24,6 @@ syntax enable
 set background=dark
 colorscheme solarized
 
-" Set the font to Inconsolata
-set guifont=Inconsolata
-
 " 1 tab is 4 columns wide and uses \t
 set shiftwidth=4
 set tabstop=4
@@ -44,7 +41,9 @@ set foldlevel=99
 " Setting for list view
 set lcs=tab:\|\ 
 
-" Use spaces in python and scheme files instead of tabs
-autocmd BufRead *.py set expandtab 
-autocmd BufRead *.scm set expandtab
+" Auto indent in python/java
+autocmd BufRead *.py set smartindent cinwords=:
+autocmd BufRead *.py set expandtab tabstop=4 shiftwidth=4 softtabstop=4
+autocmd BufRead *.scm set expandtab tabstop=4 shiftwidth=4 softtabstop=4
+autocmd BufRead *.java set smartindent cinwords={,)
 
