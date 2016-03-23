@@ -34,7 +34,7 @@ set noexpandtab
 set autoindent
 
 " Set fdm to syntax
-set fdm=syntax
+set fdm=indent
 " Open all folds
 set foldlevel=99
 
@@ -46,4 +46,5 @@ autocmd BufRead *.py set smartindent cinwords=:
 autocmd BufRead *.py set expandtab tabstop=4 shiftwidth=4 softtabstop=4
 autocmd BufRead *.scm set expandtab tabstop=4 shiftwidth=4 softtabstop=4
 autocmd BufRead *.java set smartindent cinwords={,)
-
+" Automatically delete trailing whitespace
+autocmd FileType c,cpp,java,scm,py autocmd BufWritePre <buffer> :%s/\s\+$//e
