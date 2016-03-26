@@ -1,0 +1,48 @@
+#!/bin/zsh
+##################################################
+# Joshua's Backup Script
+# Backups important files to an encrypted tarball
+##################################################
+
+# Backup the list of prgrams installed
+
+pacman -Qe > ~/installed_programs.txt
+
+# List all files to be backuped
+
+config=(~/.vimrc ~/.bashrc ~/.zshrc ~/.zprofile ~/.zshenv ~/.histfile ~/.Xresources ~/.xinitrc ~/.fehbg ~/.i3status.conf ~/installed_programs.txt)
+
+dot_folders=(~/.mozilla ~/.vim ~/.i3)
+
+folders=(~/Documents ~/Dropbox ~/Pictures)
+
+
+
+
+backup_files=($config $dot_folders $folders)
+
+# Backup location
+dest='/mnt/backup'
+
+# Naming the file
+day=$(date +%F)
+backup_name="backup-$day.tar.bz2"
+
+# Running the commands
+# Creates the tarball, encrypts it, moves it, then removes the tarball from the
+    # home directory to the backup location. That step requires root priveleges
+echo
+echo "Backing up $backup_files to $dest/$backup_name"
+tar -cvjf ~/$backup_name $backup_files 
+echo
+echo "The files will be encrypted using GPG symmetric encryption"
+echo
+gpg -c ~/$backup_name 
+
+echo
+echo "File encrypted. Moving it to the backup location. Sudo is required"
+
+
+sudo mv ~/$backup_name.gpg $dest/$backup_name.gpg
+rm ~/$backup_name
+rm ~/installed_programs.txt
