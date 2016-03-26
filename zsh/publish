@@ -1,0 +1,9 @@
+# Pushes the given webpages to my ec2 server
+# Warning, this is very brittle, and the file paths must match exactly
+
+function publish() {
+	for file_path ($*);
+		do scp -i ~/.ssh/joshua.pem $file_path $ec2server:/data/www/$file_path
+	done
+}
+
