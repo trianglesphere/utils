@@ -1,0 +1,15 @@
+#!/usr/bin/python
+# Created by Joshua Gutow. Copyright 2016 under the MIT License.
+
+import subprocess
+
+vol = subprocess.run(["pactl", "list", "sinks"], stdout=subprocess.PIPE).stdout
+vol = vol.decode("utf=8")
+vol = vol[vol.find("Sink #1"):]
+vol = vol[vol.find("Volume"):]
+vol = vol[:vol.find("%")]
+vol = vol[vol.rfind(" ") + 1:]
+
+print(vol + "%")
+
+
