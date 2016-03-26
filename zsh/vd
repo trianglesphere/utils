@@ -1,0 +1,3 @@
+function vd() {
+	pactl set-sink-volume 1 -$1%
+}
