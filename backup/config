@@ -4,20 +4,17 @@
 # Backups important files and configs to a tarball
 ##################################################
 
-# Backup the list of prgrams installed
+# Backup the list of programs installed
 pacman -Qet > ~/installed_programs.txt
 
-# List all files to be backuped
+# List all files to be backed up
 
 config=(~/.zshrc ~/.zlogin ~/.zshenv ~/.histfile ~/.Xresources ~/.xinitrc \
 ~/.gitconfig ~/.xbindkeysrc ~/.config/user-dirs.dirs ~/installed_programs.txt)
 
-dot_folders=(~/.mozilla ~/.vim ~/.ssh ~/.config/i3 ~/.config/i3status)
+dot_folders=(~/.mozilla ~/.vim ~/.ssh ~/.config/i3 ~/.config/i3status ~/utils)
 
-folders=(~/utils)
-
-
-backup_files=($config $dot_folders $folders)
+backup_files=($config $dot_folders)
 
 verbose="false"
 if [[ "$verbose" == "true" ]];
@@ -25,7 +22,6 @@ if [[ "$verbose" == "true" ]];
 else
 	flags="-cjf"
 fi
-	
 
 # Naming the file
 day=$(date +%F)
