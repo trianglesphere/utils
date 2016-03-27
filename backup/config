@@ -1,0 +1,38 @@
+#!/bin/zsh
+##################################################
+# Joshua's Backup Script
+# Backups important files and configs to a tarball
+##################################################
+
+# Backup the list of prgrams installed
+pacman -Qet > ~/installed_programs.txt
+
+# List all files to be backuped
+
+config=(~/.zshrc ~/.zlogin ~/.zshenv ~/.histfile ~/.Xresources ~/.xinitrc \
+~/.gitconfig ~/.xbindkeysrc ~/.config/user-dirs.dirs ~/installed_programs.txt)
+
+dot_folders=(~/.mozilla ~/.vim ~/.ssh ~/.config/i3 ~/.config/i3status)
+
+folders=(~/utils)
+
+
+backup_files=($config $dot_folders $folders)
+
+verbose="false"
+if [[ "$verbose" == "true" ]];
+	then flags="-cjvf"
+else
+	flags="-cjf"
+fi
+	
+
+# Naming the file
+day=$(date +%F)
+comp="desktop"
+backup_name="$comp-configs-$day.tar.bz2"
+
+tar $flags ~/$backup_name $backup_files
+
+rm ~/installed_programs.txt
+
