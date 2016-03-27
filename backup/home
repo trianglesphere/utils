@@ -1,0 +1,23 @@
+#!/bin/zsh
+##################################################
+# Joshua's Backup Script
+# Backups my home folder. Does not back up my configs.
+##################################################
+
+# List all files to be backed up
+folders=(~/Documents ~/Downloads ~/Dropbox ~/Pictures ~/utils)
+
+verbose="false"
+if [[ "$verbose" == "true" ]];
+	then flags="-cjvf"
+else
+	flags="-cjf"
+fi
+
+# Naming the file
+day=$(date +%F)
+comp="desktop"
+backup_name="$comp-backup-$day.tar.bz2"
+
+tar $flags ~/$backup_name $backup_files
+
