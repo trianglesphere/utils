@@ -5,7 +5,7 @@
 ##################################################
 
 # List all files to be backed up
-backup_files=(~/Documents ~/Downloads ~/Dropbox ~/Pictures ~/utils)
+backup_files=(~/Documents ~/Dropbox ~/Pictures ~/utils)
 
 verbose="false"
 if [[ "$verbose" == "true" ]];
