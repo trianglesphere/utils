@@ -9,9 +9,9 @@ backup_files=(~/Documents ~/Downloads ~/Dropbox ~/Pictures ~/utils)
 
 verbose="false"
 if [[ "$verbose" == "true" ]];
-	then flags="-cjvf"
+	then flags="-chjvf"
 else
-	flags="-cjf"
+	flags="-chjf"
 fi
 
 # Naming the file

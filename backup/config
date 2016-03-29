@@ -18,9 +18,9 @@ backup_files=($config $dot_folders)
 
 verbose="false"
 if [[ "$verbose" == "true" ]];
-	then flags="-cjvf"
+	then flags="-chjvf"
 else
-	flags="-cjf"
+	flags="-chjf"
 fi
 
 # Naming the file
