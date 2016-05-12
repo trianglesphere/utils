@@ -1,16 +1,16 @@
 #!/usr/bin/python
 # Developed by Joshua Gutow. Copyright 2016 under the MIT License.
 
-desc = '''This program takes manually word-wrapped files and unword wraps them.
+desc = '''This program takes manually word-wrapped files and un-word-wraps them.
 
-This program unword wraps using the following rules:
+This program un-word-wraps using the following rules:
     1. If there are multiple newlines in a row, only the first will be removed.
     2. It will only merge lines if they have the same indent level.
-    3. It will try to perserve lists and simple bullet points.
+    3. It will try to preserve lists and simple bullet points.
 
 You can give a file name, pipe text to it, or run rfmt without any parameters,
 and press CTRL-D (EOF) when you are done. If given both a file and STDIN, rfmt
-will rfmt the file.'''
+will reformat the file.'''
 
 import argparse
 import sys
@@ -20,12 +20,11 @@ import re
 parser = argparse.ArgumentParser(description=desc,
                         formatter_class=argparse.RawDescriptionHelpFormatter)
 parser.add_argument("File", type=argparse.FileType('r'), metavar='F',
-                     help="File to be read from. Can also use STDIN.",
+                     help="File to be read from.",
                      nargs='?')
 args = parser.parse_args()
 
 # Reads either from STDIN or the specified file.
-# Throws an error is there is no input.
 if args.File != None:
     file = args.File
 else:
@@ -47,7 +46,7 @@ def merge(one, two):
 def append(one, two):
     return one + "\n" + two
 
-# Figues out the ident level of a function.
+# Figures out the indent level of a function.
 def indent_level(string):
     lvl = 0
     for char in string:
@@ -57,7 +56,7 @@ def indent_level(string):
             break
     return lvl
 
-# Figues out if a the line contains the start of a list.
+# Figures out if the line contains the start of a list.
 def start_list(string):
     list_patterns = ["[0-9]?[.][ ]", "[*][ ]", "[A-Z][.][ ]"]
     string = string.lstrip()
