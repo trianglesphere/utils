@@ -11,7 +11,7 @@ The file .timer.log in the current directory is used to track the time spent.
 The timer log stores the info in the following format: "[start/stop]:date\ttask"
 
 
-Avaliable commands:
+Available commands:
     start - log the current time as the start time.
     stop - log the current time as the end time.
     total - print out how much time has been spent.'''
@@ -65,7 +65,7 @@ def print_total(task):
     for line in f:
         line = line.rstrip()
 
-        # Figues out if you have built up a match
+        # Figures out if you have built up a match
         if s1 != "" and s2 != "":
             sum += get_time(s2) - get_time(s1)
             s1 = ""
