@@ -29,11 +29,11 @@ def clean():
 
     for obj in path_list:
         verbose("Deleting " + obj)
-        #os.remove(obj)
+        os.remove(obj)
 
     for obj in dir_list:
         verbose("Deleting " + obj)
-        #os.rmdir(obj)
+        os.rmdir(obj)
 
 # Compiles the file that matches the filename
 def build(filename):
