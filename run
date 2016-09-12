@@ -8,7 +8,7 @@ import sys
 import os
 
 # Global flag to determine if the program should be verbose or not
-VERBOSE = True
+VERBOSE = False
 
 
 
