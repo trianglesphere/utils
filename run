@@ -8,8 +8,13 @@ import sys
 import os
 
 # Global flag to determine if the program should be verbose or not
-global VERBOSE
-VERBOSE = False
+VERBOSE = True
+
+
+
+jfile  = "main"
+blddir = "build/"
+srcdir = "src/"
 
 
 # Prints the message if verbose mode is on
@@ -19,21 +24,27 @@ def verbose(msg):
 
 # Nukes the build directory
 def clean():
-    verbose("Deleting every file in build/")
-    path_list = lsfiles("build/")
-    dir_list = lsdirs("build/")
+    path_list = lsfiles(blddir)
+    dir_list = lsdirs(blddir)
 
     for obj in path_list:
-        if os.path.isfile(obj):
-            os.remove(obj)
+        verbose("Deleting " + obj)
+        #os.remove(obj)
+
     for obj in dir_list:
-        os.rmdir(obj)
+        verbose("Deleting " + obj)
+        #os.rmdir(obj)
 
 # Compiles the file that matches the filename
 def build(filename):
+
+    if not os.path.isdir(blddir):
+        os.mkdir(blddir)
+
     compiler = "javac"
-    j_flags = ["-d", "build/", "-cp", "src/", "-g", "-Xprefer:newer"]
-    j_params = [compiler] + j_flags + ["src/" + filename + ".java"]
+    j_file  = [srcdir + filename + ".java"]
+    j_flags  = ["-d", blddir, "-cp", srcdir, "-g", "-Xprefer:newer"]
+    j_params = [compiler] + j_flags + j_file
     try:
         tmp = subprocess.call(j_params)
         verbose(" ".join(j_params))
@@ -42,7 +53,7 @@ def build(filename):
 
 # Runs the build
 def execute():
-    params = ["java", "-cp", "build/", "main"]
+    params = ["java", "-cp", blddir, jfile]
     verbose(" ".join(params) + "\n----Output Below----")
     try:
         subprocess.call(params)
@@ -51,18 +62,19 @@ def execute():
 
 # Gets all the files in a dir tree where the given dir is the root
 def lsfiles(directory):
-	if directory[-1] != "/":
-		directory = directory + "/"
-	tmp = os.listdir(directory)
-	ret = []
-	for path in tmp:
-		if os.path.isdir(directory + path):
-			ret = ret + lsfiles(directory+ path)
-		else:
-			ret.append(directory + path)
-	return ret
+     if directory[-1] != "/":
+          directory = directory + "/"
+     tmp = os.listdir(directory)
+     ret = []
+     for path in tmp:
+          if os.path.isdir(directory + path):
+               ret = ret + lsfiles(directory + path)
+          else:
+               ret.append(directory + path)
+     return ret
 
 # Gets all the directories under a parent directory
+# List begins with the most nested directories
 def lsdirs(directory):
     if directory[-1] != "/":
         directory = directory + "/"
@@ -71,47 +83,7 @@ def lsdirs(directory):
     for path in tmp:
         if os.path.isdir(directory + path):
             ret.append(directory + path)
-            if len(lsdirs(directory + path)) != 0:
-                ret.appenda(lsdirs(directory + path))
-    return ret
-
-# Checks if there is a newer source file than the existing class files
-def incremental(force_compile):
-
-    src = path_clean(lsfiles("src/"))
-    bld = path_clean(lsfiles("build/"))
-    
-    if force_compile:
-        verbose("Rebuilding the project b/c of -f flag.")
-        build("main")
-    elif len(bld) == 0:
-        verbose("Rebuilding the project b/c no files build directory.")
-        build("main")
-    else:
-        verbose("Checking if project needs to be recompiled.")        
-        for path in src:
-            if path not in bld:
-                verbose("Rebuilding b/c " + path + " is in src but not bld")
-                build(path)
-            elif is_updated(path):
-                verbose("Rebuilding b/c a change was found in " + path)
-                break
-            else:
-                verbose("Not rebuilding " + path)
-
-# Given a filename, this checks if the src file is newer than the .class file
-def is_updated(filename):
-    srcpath = "src/"
-    bldpath = "build/"
-    src = os.stat(srcpath + filename + ".java").st_mtime_ns
-    bld = os.stat(bldpath + filename + ".class").st_mtime_ns
-    return src > bld
-
-# Cleans up the path lists so that we are only looking at what we care about
-def path_clean(path_list):
-    ret = []
-    for path in path_list:
-        ret.append(path[path.find("/") + 1:path.find(".")])
+            ret = lsdirs(directory + path) + ret
     return ret
 
 # Main method of the program
@@ -119,41 +91,41 @@ def main():
 
     # Sets up the flags that can be passed to the build system
     parser = argparse.ArgumentParser(
-        description="builds and then runs the project as described by the makefile")
-    parser.add_argument("-r", "--rebuild", action="store_true", 
-        help="runs make clean before building the project")
-    parser.add_argument("--run", action="store_true", 
-        help="attempts to run the project without compiling it")
+        description="By default, this program will compile the project and then attempt to run it if the build succeeded.")
+    parser.add_argument("-c", "--clean", action="store_true", 
+        help="Deletes all build files")
+    parser.add_argument("-r", "--run", action="store_true", 
+        help="Attempts to run the project without building it first")
     parser.add_argument("-v", "--verbose", action="store_true", 
-        help="prints what the program is doing")
-    parser.add_argument("-c", "--compile", action="store_true",
-        help="compiles the project without running it")
-    parser.add_argument("-f", "--force", action="store_true", 
-        help="forces the program to recompile the entire project")
+        help="Prints what the program is doing")
+    parser.add_argument("-b", "--build", action="store_true",
+        help="Builds the project")
+    parser.add_argument("-f", "--fresh", action="store_true", 
+        help="Deletes build files then recompiles the project")
     args = parser.parse_args()
 
-    if not os.path.isfile("makefile") and not os.path.isfile("Makefile"):
-        print("There must be a vaild makefile in the directory.")
-        sys.exit(1)
 
-    if args.verbose == True:        # If -v was passed, VERBOSE = True
+    # Default: compile then run
+    # --clean: clean up                                 --clean,   -c
+    # --build: only build                               --build,   -b
+    # --run: only run                                   --run,     -r
+    # --fresh-build: clean up then compile then run     --fresh,   -f
+
+    if args.verbose == True:
         global VERBOSE
         VERBOSE = True
-    rebuild = args.rebuild          # If -r was passed, clean = True
-    build = args.compile            # If -c was passed, comp = True
-    force = args.force              # If -f was passed, force = True
-    run = args.run                  # If --run was passed, run = True
 
-    
-    if rebuild:
+    if args.clean:
         clean()
-
-    if build:
-        incremental(force)
-    elif run:
+    elif args.build:
+        build(jfile)
+    elif args.run:
         execute()
+    elif args.fresh:
+        clean()
+        build(jfile)
     else:
-        incremental(force)
+        build(jfile)
         execute()
 
 # Runs the program
