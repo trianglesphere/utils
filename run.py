@@ -8,13 +8,22 @@ import sys
 import os
 
 # Global flag to determine if the program should be verbose or not
-VERBOSE = True
+VERBOSE = False
 
 
 
 jfile  = "main"
 blddir = "build/"
 srcdir = "src/"
+libs   = ":/home/joshua/lib/*"
+
+# Reads the config file in the current directory
+def load_config():
+    global jfile
+    jfile = "BlobGUI"
+    global blddir
+    global srcdir
+    global classpath
 
 
 # Prints the message if verbose mode is on
@@ -43,7 +52,7 @@ def build(filename):
 
     compiler = "javac"
     j_file  = [srcdir + filename + ".java"]
-    j_flags  = ["-d", blddir, "-cp", srcdir, "-g", "-Xprefer:newer"]
+    j_flags  = ["-d", blddir, "-cp", srcdir + libs, "-g", "-Xprefer:newer"]
     j_params = [compiler] + j_flags + j_file
     try:
         tmp = subprocess.call(j_params)
@@ -53,7 +62,7 @@ def build(filename):
 
 # Runs the build
 def execute():
-    params = ["java", "-cp", blddir, jfile]
+    params = ["java", "-cp", blddir + libs, jfile]
     verbose(" ".join(params) + "\n----Output Below----")
     try:
         subprocess.call(params)
@@ -114,6 +123,13 @@ def main():
     if args.verbose == True:
         global VERBOSE
         VERBOSE = True
+
+    load_config()
+
+    if not os.path.isdir("/home/joshua/lib/"):
+        global libs
+        libs = ""
+
 
     if args.clean:
         clean()
