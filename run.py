@@ -19,12 +19,14 @@ libs   = ":/home/joshua/lib/*"
 
 # Reads the config file in the current directory
 def load_config():
+
+    # Set global vars
     global jfile
-    jfile = "BlobGUI"
     global blddir
     global srcdir
     global classpath
 
+    jfile = "PaintedImage"
 
 # Prints the message if verbose mode is on
 def verbose(msg):
