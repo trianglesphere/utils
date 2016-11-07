@@ -1,4 +1,4 @@
-" Copyright (c) 2015 Joshua Gutow under the MIT License
+" Copyright (c) 2015-2016 Joshua Gutow under the MIT License
 
 " Sets how many lines of history VIM has to remember
 set history=700
@@ -39,11 +39,15 @@ set fdm=indent
 set foldlevel=99
 
 " Setting for list view
-set lcs=tab:\|\ 
+set lcs=tab:\>\ ,trail:\-
+
+" I want spellcheck
+set spell
 
 " Auto indent in python/java
 autocmd BufRead *.py set smartindent cinwords=:
 autocmd BufRead *.py set expandtab tabstop=4 shiftwidth=4 softtabstop=4
+autocmd BufRead *.hs set expandtab tabstop=8 shiftwidth=4 softtabstop=4 spell!
 autocmd BufRead *.scm set expandtab tabstop=4 shiftwidth=4 softtabstop=4
 autocmd BufRead *.java set smartindent cinwords={,)
 " Automatically delete trailing whitespace
