@@ -9,6 +9,7 @@ call vundle#begin()
 Plugin 'VundleVim/Vundle.vim'
 Plugin 'bbchung/clighter8'
 Plugin 'altercation/vim-colors-solarized'
+Plugin 'JuliaEditorSupport/julia-vim'
 
 call vundle#end()
 filetype plugin indent on
