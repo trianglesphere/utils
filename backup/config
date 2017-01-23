@@ -10,7 +10,8 @@ pacman -Qet > ~/installed_programs.txt
 # List all files to be backed up
 
 config=(~/.zshrc ~/.zlogin ~/.zshenv ~/.histfile ~/.Xresources ~/.xinitrc \
-~/.gitconfig ~/.xbindkeysrc ~/.config/user-dirs.dirs ~/installed_programs.txt)
+~/.gitconfig ~/.xbindkeysrc ~/.config/user-dirs.dirs ~/installed_programs.txt \
+~/.Xmodmap)
 
 dot_folders=(~/.mozilla ~/.vim ~/.ssh ~/.config/i3 ~/.config/i3status ~/utils)
 
