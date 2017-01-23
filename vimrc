@@ -24,10 +24,10 @@ syntax enable
 set background=dark
 colorscheme solarized
 
-" 1 tab is 4 columns wide and uses \t
-set shiftwidth=4
-set tabstop=4
-set softtabstop=4
+" 1 tab is 8 columns wide and uses \t
+set shiftwidth=8
+set tabstop=8
+set softtabstop=8
 set noexpandtab
 
 " Automatically match the indent of the previous line

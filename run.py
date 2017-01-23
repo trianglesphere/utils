@@ -12,26 +12,49 @@ VERBOSE = False
 
 
 
-jfile  = "main"
+jfile  = "Main"
 blddir = "build/"
 srcdir = "src/"
 libs   = ":/home/joshua/lib/*"
 
 # Reads the config file in the current directory
 def load_config():
-
     # Set global vars
     global jfile
     global blddir
     global srcdir
     global classpath
 
-    jfile = "PaintedImage"
+    import configparser
+    config = configparser.ConfigParser()
+    config.read(["run.cfg", ".run.cfg", ".run"])
+    if config.has_option("OPTIONS", "main_file"):
+        jfile = config["OPTIONS"]["main_file"]
+
+    if config.has_option("OPTIONS", "build_dir"):
+        blddir = config["OPTIONS"]["build_dir"]
+
+    if config.has_option("OPTIONS", "src_dir"):
+        srcdir = config["OPTIONS"]["src_dir"]
+
+    if config.has_option("OPTIONS", "classpath"):
+        libs = config["OPTIONS"]["classpath"]
+
+# Write a standard config to the current directory
+def write_default_config():
+    import configparser
+    config = configparser.ConfigParser()
+    config["OPTIONS"] = {"main_file" : jfile,
+                         "build_dir" : blddir,
+                         "src_dir"   : srcdir,
+                         "classpath" : libs}
+    with open("run.cfg", 'w') as configfile:
+        config.write(configfile)
 
 # Prints the message if verbose mode is on
 def verbose(msg):
     if VERBOSE:
-        print(msg) 
+        print(msg)
 
 # Nukes the build directory
 def clean():
@@ -54,7 +77,7 @@ def build(filename):
 
     compiler = "javac"
     j_file  = [srcdir + filename + ".java"]
-    j_flags  = ["-d", blddir, "-cp", srcdir + libs, "-g", "-Xprefer:newer"]
+    j_flags  = ["-d", blddir, "-cp", srcdir + libs, "-g", "-Xprefer:newer", "-Xlint:unchecked"]
     j_params = [compiler] + j_flags + j_file
     try:
         tmp = subprocess.call(j_params)
@@ -113,6 +136,8 @@ def main():
         help="Builds the project")
     parser.add_argument("-f", "--fresh", action="store_true", 
         help="Deletes build files then recompiles the project")
+    parser.add_argument("-w", "--config", action="store_true",
+        help="Writes the default options to a cfg file.")
     args = parser.parse_args()
 
 
@@ -121,17 +146,22 @@ def main():
     # --build: only build                               --build,   -b
     # --run: only run                                   --run,     -r
     # --fresh-build: clean up then compile then run     --fresh,   -f
+    # --gen-config: generate the config and do nothing else
+
+    # Check for custom config file.
+    load_config()
 
     if args.verbose == True:
         global VERBOSE
         VERBOSE = True
 
-    load_config()
-
     if not os.path.isdir("/home/joshua/lib/"):
         global libs
         libs = ""
 
+    if args.config:
+        write_default_config()
+        sys.exit(0)
 
     if args.clean:
         clean()
