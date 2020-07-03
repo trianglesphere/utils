@@ -1,0 +1,41 @@
+" Copyright (c) 2015-2020 Joshua Gutow under the MIT License
+
+" Set line nums, ruler, no word wrap(?)
+set number
+set colorcolumn=81
+set textwidth=0
+
+" Enable syntax highlighting
+syntax enable
+set spell
+set autoindent
+
+" Colorscheme stuff
+" let g:solarized_termcolors=256
+set background=light
+colorscheme solarized
+" let g:monochrome_italic_comments = 1
+" colorscheme monochrome
+
+" 1 tab is 8 columns wide and uses \t
+set shiftwidth=8
+set tabstop=8
+set softtabstop=8
+set noexpandtab
+	
+" Setting for list view
+set lcs=tab:\>\ ,trail:\-
+
+" Set fdm to syntax & open them by default
+set fdm=indent
+set foldlevel=99
+
+" Look for tag files
+set tags=./tags,tags;
+
+" Sets how many lines of history VIM has to remember
+set history=800
+
+" Stops Vim from beeping
+set noerrorbells visualbell t_vb=
+autocmd GUIEnter * set visualbell t_vb=
